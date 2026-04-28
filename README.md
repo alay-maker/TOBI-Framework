@@ -1,5 +1,10 @@
-# T.O.B.I. Framework 🐶
-**T**raffic **O**rchestration **B**aseline for **I**ntelligence
+<div align="center">
+  <img src="tobi-logo.svg" alt="Logo de Tobi" width="250"/>
+  <h1>T.O.B.I. Framework</h1>
+  <p><b>T</b>raffic <b>O</b>rchestration <b>B</b>aseline for <b>I</b>ntelligence</p>
+</div>
+
+<br>
 
 > *"In the era of hyper-automation, the greatest risk is not obsolescence, but vulnerability through ignorance. T.O.B.I. is the infrastructure that allows you to delegate heavy lifting to machines while maintaining learning, governance, and absolute control in human hands."*
 
