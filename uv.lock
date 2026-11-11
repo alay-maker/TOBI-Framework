@@ -2932,6 +2932,7 @@ source = { editable = "." }
 dependencies = [
     { name = "duckdb" },
     { name = "instructor" },
+    { name = "mcp" },
     { name = "ollama" },
     { name = "polars" },
     { name = "pyarrow" },
@@ -2950,6 +2951,7 @@ dev = [
 requires-dist = [
     { name = "duckdb", specifier = ">=2.0.0" },
     { name = "instructor", specifier = ">=1.17.0" },
+    { name = "mcp", specifier = ">=2.3.0" },
     { name = "ollama", specifier = ">=0.6.3" },
     { name = "polars", specifier = ">=2.1.0" },
     { name = "pyarrow", specifier = ">=26.0.1" },

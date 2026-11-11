@@ -1,8 +1,10 @@
 from tobi.core.rules import Lane, RuleSeverity, TrafficRule
 from tobi.core.vehicle import Vehicle
 from tobi.engines.local_llm import LocalLLMEngine
+from tobi.interfaces.n8n_bridge import N8nBridge
 from tobi.memory.policy_rag import PolicyRAG
 from tobi.tower.blackbox import BlackBox
+from tobi.tower.error_budget import ErrorBudgetMonitor
 
 
 class Road:
@@ -12,6 +14,8 @@ class Road:
         confidence_threshold: float = 0.85,
         blackbox: BlackBox | None = None,
         policy_rag: PolicyRAG | None = None,
+        n8n_bridge: N8nBridge | None = None,
+        error_budget: ErrorBudgetMonitor | None = None,
     ):
         self.name = name
         self.confidence_threshold = confidence_threshold
@@ -19,6 +23,8 @@ class Road:
         self.post_rules: list[TrafficRule] = []
         self.blackbox = blackbox
         self.policy_rag = policy_rag
+        self.n8n_bridge = n8n_bridge
+        self.error_budget = error_budget
 
     def add_pre_rule(self, rule: TrafficRule) -> None:
         self.pre_rules.append(rule)
@@ -27,6 +33,10 @@ class Road:
         self.post_rules.append(rule)
 
     def _finalize_transit(self, vehicle: Vehicle) -> Vehicle:
+        if self.n8n_bridge is not None and vehicle.assigned_lane in (Lane.MIDDLE, Lane.SLOW):
+            ticket_path = self.n8n_bridge.dispatch_for_review(vehicle, road_name=self.name)
+            vehicle.log_event(f"Ticket enviado a n8n: {ticket_path.name}")
+
         vehicle.log_event(f"Tránsito finalizado en: {vehicle.assigned_lane.value}")
         if self.blackbox is not None:
             self.blackbox.record_transit(vehicle, road_name=self.name)
@@ -34,6 +44,17 @@ class Road:
 
     def transit(self, vehicle: Vehicle, run_llm: bool = True) -> Vehicle:
         vehicle.log_event(f"Entrando en carretera: {self.name}")
+
+        # 0. Pilar 6: Verificación de Presupuesto de Carga Cognitiva (Error Budget)
+        if self.error_budget is not None and self.n8n_bridge is not None:
+            status = self.error_budget.evaluate_load(self.n8n_bridge.count_pending_reviews())
+            if status.is_overloaded:
+                vehicle.assigned_lane = Lane.SLOW
+                vehicle.log_event(
+                    f"Error Budget agotado ({status.current_pending}/"
+                    f"{status.max_pending_reviews} pendientes): tráfico detenido en Carril Lento"
+                )
+                return self._finalize_transit(vehicle)
 
         # 1. Filtro Previo (Policy-as-Code a coste cero)
         for rule in self.pre_rules:

@@ -19,6 +19,15 @@ class AuditRecord(BaseModel):
     audit_log: str
 
 
+class DrivingSchoolRecord(BaseModel):
+    license_plate: str
+    reviewer: str
+    approved: bool
+    ai_draft: str
+    human_correction: str
+    feedback_notes: str
+
+
 class BlackBox:
     def __init__(self, db_path: str | Path | None = None):
         if db_path is None:
@@ -33,7 +42,7 @@ class BlackBox:
         self._init_db()
 
     def _init_db(self) -> None:
-        """Inicializa la tabla vehicles_audit en DuckDB si no existe."""
+        """Inicializa las tablas vehicles_audit y driving_school en DuckDB."""
         with duckdb.connect(self.db_path) as con:
             con.execute(
                 """
@@ -46,6 +55,19 @@ class BlackBox:
                     payload_json TEXT,
                     output_json TEXT,
                     audit_log TEXT
+                )
+                """
+            )
+            con.execute(
+                """
+                CREATE TABLE IF NOT EXISTS driving_school (
+                    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    license_plate VARCHAR,
+                    reviewer VARCHAR,
+                    approved BOOLEAN,
+                    ai_draft TEXT,
+                    human_correction TEXT,
+                    feedback_notes TEXT
                 )
                 """
             )
@@ -88,7 +110,36 @@ class BlackBox:
                 ],
             )
 
+    def record_human_feedback(self, record: DrivingSchoolRecord) -> None:
+        """Registra la auditoría humana de La Autoescuela en DuckDB."""
+        with duckdb.connect(self.db_path) as con:
+            con.execute(
+                """
+                INSERT INTO driving_school (
+                    license_plate,
+                    reviewer,
+                    approved,
+                    ai_draft,
+                    human_correction,
+                    feedback_notes
+                ) VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                [
+                    record.license_plate,
+                    record.reviewer,
+                    record.approved,
+                    record.ai_draft,
+                    record.human_correction,
+                    record.feedback_notes,
+                ],
+            )
+
     def fetch_audit_dataframe(self) -> pl.DataFrame:
-        """Devuelve el historial completo como un DataFrame de Polars vía Apache Arrow (Zero-Copy)."""
+        """Devuelve el historial de tráfico como un DataFrame de Polars vía Apache Arrow."""
         with duckdb.connect(self.db_path) as con:
             return con.sql("SELECT * FROM vehicles_audit").pl()
+
+    def fetch_driving_school_dataframe(self) -> pl.DataFrame:
+        """Devuelve las correcciones humanas registradas como un DataFrame de Polars."""
+        with duckdb.connect(self.db_path) as con:
+            return con.sql("SELECT * FROM driving_school").pl()
