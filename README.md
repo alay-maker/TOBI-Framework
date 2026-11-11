@@ -179,8 +179,8 @@ uv run ruff format --check .
 
 * [x] **Phase 1: Environment & Foundations** — Modular `src/tobi` architecture, `uv` reproducible build system, `.envrc` configuration, and storage isolation.
 * [x] **Phase 2: Core OOP Genome & Local FinOps** — `Vehicle`, `Road`, and `TrafficRule` entities, zero-cost `Ruff` & encryption heuristics, structured local inference with Ollama + Instructor, and unit test suite.
-* [ ] **Phase 3: Anti-Hallucination Policy Library & Black Box** — Automated DuckDB/Polars audit logging (`vehicles_audit`) and Qdrant vector validation (`policy_library`).
-* [ ] **Phase 4: Middle-Lane n8n Bridge & Self-Construction via MCP** — Human-in-the-loop review workflows via `/data/shared` in n8n and MCP server exposure.
+* [x] **Phase 3: Anti-Hallucination Policy Library & Black Box** — Automated DuckDB/Polars audit logging (`vehicles_audit`) and Qdrant vector validation (`policy_library`).
+* [x] **Phase 4: Middle-Lane n8n Bridge & Self-Construction via MCP** — Human-in-the-loop review workflows via `/data/shared` in n8n and MCP server exposure.
 
 ## ⚠️ Disclaimer
 
