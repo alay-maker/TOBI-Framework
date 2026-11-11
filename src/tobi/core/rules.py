@@ -18,7 +18,9 @@ class RuleSeverity(str, Enum):
 
 class TrafficRule(BaseModel):
     rule_id: str = Field(description="Identificador único de la regla")
-    description: str = Field(description="Explicación de la política de seguridad o calidad")
+    description: str = Field(
+        description="Explicación de la política de seguridad o calidad"
+    )
     severity: RuleSeverity = Field(default=RuleSeverity.BLOCK_TO_SLOW)
     validator: Callable[[dict[str, Any]], bool] = Field(exclude=True)
 
@@ -26,6 +28,6 @@ class TrafficRule(BaseModel):
         """Devuelve True si el vehículo cumple la norma, False si la infringe."""
         try:
             return self.validator(payload)
-        except Exception as e: #noqa: BLE001
+        except Exception as e:  # noqa: BLE001
             print(f"Error en validación de regla {self.rule_id}: {e}")
             return False

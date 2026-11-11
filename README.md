@@ -161,7 +161,6 @@ result = dev_road.transit(vehicle, run_llm=True)
 print(f"License Plate: {result.license_plate}")
 print(f"Assigned Lane: {result.assigned_lane.value}")
 print(f"Audit Log: {result.audit_log}")
-
 ```
 
 ### 4. Running Tests & Code Quality

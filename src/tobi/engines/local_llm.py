@@ -6,9 +6,15 @@ from pydantic import BaseModel, Field
 
 
 class CodeGenerationResponse(BaseModel):
-    python_code: str = Field(description="Código Python limpio y ejecutable, sin bloques markdown")
-    explanation: str = Field(description="Breve justificación técnica de una sola frase")
-    confidence: float = Field(ge=0.0, le=1.0, description="Nivel de certeza de la solución")
+    python_code: str = Field(
+        description="Código Python limpio y ejecutable, sin bloques markdown"
+    )
+    explanation: str = Field(
+        description="Breve justificación técnica de una sola frase"
+    )
+    confidence: float = Field(
+        ge=0.0, le=1.0, description="Nivel de certeza de la solución"
+    )
 
 
 class LocalLLMEngine:
